@@ -52,3 +52,8 @@ class DataGenerator:
     def generator_reset(self):
         self.i = 0
         
+    def get_image(self, shape=0, scale=0, orientation=0, x=0, y=0):
+        latents = [0, shape, scale, orientation, x, y]
+        index = np.dot(latents, self.latents_possible_values).astype(int)
+        return self.get_images([index])[0]
+

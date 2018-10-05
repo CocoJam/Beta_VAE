@@ -170,7 +170,9 @@ class B_VAE:
         return sess.run(self.out, 
                     feed_dict={self.x: x})
 
-    
+    def transform(self, x, sess):
+        return sess.run([self.mu, self.sigma], 
+                    feed_dict={self.x: x})
         
            
            

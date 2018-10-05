@@ -18,7 +18,7 @@ flags.DEFINE_float("gamma", 100.0, "Gemma for loss function")
 flags.DEFINE_float("capacity_limit", 20.0, "Max capcaity number")
 flags.DEFINE_float("capacity_duration", 10000, "Capcaity increaments by capacity_limit/ capacity_duration")
 flags.DEFINE_boolean("training", True, "training or not")
-flags.DEFINE_integer("epoch_num", 2000, "Epoch iteration")
+flags.DEFINE_integer("epoch_num", 20, "Epoch iteration")
 flags.DEFINE_integer("batch_size", 64, "Batch size per iteration")
 flags.DEFINE_string("log_file","/log_dir", "summary dir")
 
@@ -40,6 +40,7 @@ def train(sess, model, dataGen):
             
         dataGen.generator_reset()
         reconstruction(sess,model, random_image_reconstruction)
+        disentable_test(sess, model, dataGen)
 
         
         
@@ -53,10 +54,25 @@ def reconstruction(sess, model, xs):
         reconstr_img = x_out[i].reshape(xs.shape[1], xs.shape[2])
         imsave("reconstr_img/org_{0}.png".format(i),      org_img)
         imsave("reconstr_img/reconstr_{0}.png".format(i), reconstr_img)
+
+def disentable_test(sess, model, dataGen):
+    img = dataGen.get_image(shape=1, scale=2, orientation=5)
+    batch_xs = [img]
+    z_mean, z_sigma = model.transform(batch_xs,sess)
+    z_sigma = np.exp(z_sigma)[0]
+    zss_str = ""
+    for i,zss in enumerate(z_sigma):
+        str = "z{0}={1:.4f}, m{2}={3:.4f}".format(i,zss,i, z_mean[i])
+        zss_str += str + ", "
+    print(zss_str)
+
+
         
 def main():
     dataGen = DataGenerator(iterationNum=flag.batch_size)
     print(dataGen.iterationNum)
+    random_image_reconstruction = dataGen.get_random_images(10)
+    print(random_image_reconstruction.shape)
     model = B_VAE( [None, dataGen.image_shape[0], dataGen.image_shape[1]],gamma= flag.gamma, capacity_limit= flag.capacity_limit,capacity_change_duration= flag.capacity_duration)
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
