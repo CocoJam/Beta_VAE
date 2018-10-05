@@ -166,6 +166,11 @@ class B_VAE:
                                                                 feed_dict={self.x: x, self.capacity: c})
         return reconstruction_loss, latent_loss, summary
     
+    def generate_reconstruction(self, x , sess):
+        return sess.run(self.out, 
+                    feed_dict={self.x: x})
+
+    
         
            
            

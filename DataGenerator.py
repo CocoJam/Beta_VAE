@@ -41,7 +41,7 @@ class DataGenerator:
         images = []
         for index in indices:
             img = self.imgs[index]
-            img = img.reshape(4096)
+            # img = img.reshape(4096)
             images.append(img)
         return np.array(images)
 
@@ -52,5 +52,3 @@ class DataGenerator:
     def generator_reset(self):
         self.i = 0
         
-    def generate_reconstruction(self, sess, xs):
-        return sess.run(self.x_out, feed_dict={self.x: xs})

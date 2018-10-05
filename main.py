@@ -40,11 +40,11 @@ def train(sess, model, dataGen):
             
         dataGen.generator_reset()
         reconstruction(sess,model, random_image_reconstruction)
-        
+
         
         
 def reconstruction(sess, model, xs):
-    x_out = model.generate_reconstruction(xs)
+    x_out = model.generate_reconstruction(xs, sess)
     if not os.path.exists("reconstr_img"):
         os.mkdir("reconstr_img")
     for i in range(xs.shape[0]):
