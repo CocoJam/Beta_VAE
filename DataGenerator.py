@@ -17,18 +17,40 @@ class DataGenerator:
 
         self.latents_possible_values = np.array([len(self.metadata['latents_possible_values'][x]) for x in self.metadata['latents_names']])
         self.n_samples = self.latents_possible_values[::-1].cumprod()[-1]
-        self.image_shape = self.imgs.shape[1]*self.imgs.shape[2]
+        self.image_shape = [self.imgs.shape[1],self.imgs.shape[2]]
+        
         if iterationNum is None:
             iterationNum = int(self.n_samples/10)
         self.iterationNum= iterationNum
         
     def __iter__(self):
-        i = 0
-        while i+self.iterationNum <= self.imgs.shape[0]:
-            yield self.imgs[i:i+self.iterationNum] , i
-            i+=self.iterationNum
-        if i == self.imgs.shape[0]:
+        self.i = 0
+        while self.i+self.iterationNum <= self.imgs.shape[0]:
+            yield self.imgs[self.i:self.i+self.iterationNum]
+            self.i+=self.iterationNum
+        if self.i == self.imgs.shape[0]:
             yield None
-        if i+self.iterationNum > self.imgs.shape[0]:
-            yield self.imgs[i+self.iterationNum:] , i
-            i= self.imgs.shape[0]
+        if self.i+self.iterationNum > self.imgs.shape[0]:
+            yield self.imgs[self.i+self.iterationNum:] 
+            self.i= self.imgs.shape[0]
+    
+    def randomized(self):
+        np.random.shuffle(self.imgs)
+    
+    def get_images(self,indices):
+        images = []
+        for index in indices:
+            img = self.imgs[index]
+            img = img.reshape(4096)
+            images.append(img)
+        return np.array(images)
+
+    def get_random_images(self, size):
+        indices = [np.random.randint(self.n_samples) for i in range(size)]
+        return self.get_images(indices)
+    
+    def generator_reset(self):
+        self.i = 0
+        
+    def generate_reconstruction(self, sess, xs):
+        return sess.run(self.x_out, feed_dict={self.x: xs})
