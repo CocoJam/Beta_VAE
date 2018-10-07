@@ -100,7 +100,7 @@ class B_VAE:
             hidden = self._deCovNet(hidden, weightcov,biascov,16, 16, 2)
 
             weightcov, biascov = self._covnNet_weights([4,4,1,32], 3,  deCovalutional=True)
-            hidden = self._deCovNet(hidden, weightcov,biascov,32, 32, 2)
+            hidden = self._deCovNet(hidden, weightcov,biascov,32, 32, 2, activation=False)
 
             print("Final out shape: ")
             print(hidden.get_shape)
@@ -167,7 +167,7 @@ class B_VAE:
         return reconstruction_loss, latent_loss, summary
     
     def generate_reconstruction(self, x , sess):
-        return sess.run(self.out, 
+        return sess.run(self.out_sigmoid, 
                     feed_dict={self.x: x})
 
     def transform(self, x, sess):
